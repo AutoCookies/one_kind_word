@@ -1,0 +1,38 @@
+one-kind-word/
+├── prisma/
+│   └── schema.prisma         # Mô hình dữ liệu Prisma
+├── public/                   # Hình ảnh, favicon, font...
+├── styles/
+│   └── layout.module.css     # CSS module cho layout
+├── src/
+│   ├── app/
+│   │   ├── [locale]/         # Locale động (vi / en / ...)
+│   │   │   ├── layout.tsx    # Layout theo ngôn ngữ
+│   │   │   ├── page.tsx      # Trang chủ
+│   │   │   ├── about/page.tsx
+│   │   │   ├── send/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   └── archive/page.tsx
+│   │   └── api/
+│   │       ├── user/
+│   │       │   ├── login/route.ts
+│   │       │   └── register/route.ts
+│   │       └── message/
+│   │           ├── random/route.ts       # Lấy message ngẫu nhiên
+│   │           ├── create/route.ts       # Gửi lời nhắn
+│   │           └── mine/route.ts         # Lời nhắn của tôi (nếu cần)
+│   ├── components/
+│   │   └── MessageCard.tsx               # Hiển thị 1 message
+│   ├── controllers/
+│   │   ├── userController.ts
+│   │   └── messageController.ts
+│   ├── services/
+│   │   ├── userService.ts
+│   │   └── messageService.ts
+│   └── lib/
+│       └── prisma.ts                     # Kết nối DB
+├── middleware.ts                         # Kiểm tra cookie (nếu cần)
+├── globals.css                           # CSS global
+├── next.config.js                        # Cấu hình Next.js + i18n
+├── tsconfig.json
+└── package.json
