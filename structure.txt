@@ -3,16 +3,17 @@ one-kind-word/
 │   └── schema.prisma         # Mô hình dữ liệu Prisma
 ├── public/                   # Hình ảnh, favicon, font...
 ├── styles/
-│   └── layout.module.css     # CSS module cho layout
+│   └── vi
+│       └── layout.module.css     # CSS module cho layout
 ├── src/
 │   ├── app/
 │   │   ├── [locale]/         # Locale động (vi / en / ...)
 │   │   │   ├── layout.tsx    # Layout theo ngôn ngữ
 │   │   │   ├── page.tsx      # Trang chủ
-│   │   │   ├── about/page.tsx
-│   │   │   ├── send/page.tsx
-│   │   │   ├── register/page.tsx
-│   │   │   └── archive/page.tsx
+│   │   │   page.tsx
+│   │   │   layout.tsx
+│   │   │   
+│   │   │   
 │   │   └── api/
 │   │       ├── user/
 │   │       │   ├── login/route.ts

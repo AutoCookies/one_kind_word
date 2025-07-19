@@ -1,0 +1,31 @@
+/* src/styles/loading.module.css */
+.loadingWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #555;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.spinner {
+  border: 4px solid #eee;
+  border-top: 4px solid #fdd835;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.message {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

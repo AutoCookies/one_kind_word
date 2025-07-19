@@ -1,0 +1,51 @@
+.body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fffefc;
+  color: #333;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Chiều cao tối thiểu bằng viewport */
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Header luôn nằm trên */
+.minimalHeader {
+  padding: 2rem 0 1rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.logo {
+  font-size: 2rem;
+  margin: 0;
+  color: #fdd835;
+  cursor: pointer;
+}
+
+.tagline {
+  font-size: 1rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+/* Main sẽ chiếm không gian còn lại */
+.main {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+/* Footer luôn ở dưới */
+.footer {
+  padding: 1.5rem 0;
+  border-top: 1px solid #eee;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}

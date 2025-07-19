@@ -1,0 +1,63 @@
+.title {
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.container {
+    border: 2px solid rgb(133, 133, 133);
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    margin: 0 auto;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.input {
+    width: 400px;
+    padding: 10px;
+    border: 1px solid #0000;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.eye {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.button {
+    background-color: #fdd835;
+    border-radius: 6px;
+    font-size: 20px;
+    padding: 5px;
+}
+
+.sigin {
+    text-align: left;
+    font-size: 10px;
+}
+
+.signinLink {
+    cursor: pointer;
+    color: #0a52ee;
+}
