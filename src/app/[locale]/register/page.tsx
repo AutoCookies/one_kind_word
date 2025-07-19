@@ -10,6 +10,7 @@ export default function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [seenPassword, setSeenPassword] = useState(false)
     const [seenConfirmPassword, setSeenConfirmPassword] = useState(false)
+    const [name, setName] = useState('');
 
     const params = useParams()
     const locale = params?.locale as string
@@ -25,10 +26,45 @@ export default function RegisterPage() {
         askToSignin: isVietnamese ? 'Bạn đã có tài khoản?' : 'Already have an account?',
     }
 
+    const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (password !== confirmPassword) {
+            alert(isVietnamese ? 'Mật khẩu xác nhận không khớp' : 'Passwords do not match');
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/user/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, name, password })
+            })
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại');
+
+            alert(isVietnamese ? 'Đăng ký thành công!' : 'Registration successful!');
+            window.location.href = `/${locale}/login`;
+
+        } catch (err: any) {
+            alert(err.message || (isVietnamese ? 'Có lỗi xảy ra' : 'Something went wrong'));
+        }
+    };
+
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>{content.title}</h1>
-            <form className={styles.form}>
+            <form className={styles.form} onSubmit={handleRegister}>
+                <input
+                    className={styles.input}
+                    type='text'
+                    placeholder={isVietnamese ? 'Nhập tên của bạn' : 'Enter your name'}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+
                 <input
                     className={styles.input}
                     type='email'

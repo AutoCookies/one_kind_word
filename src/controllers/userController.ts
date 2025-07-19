@@ -4,9 +4,9 @@ import { createUser, loginUser } from '@/services/userService'
 
 export async function registerUser(req: NextRequest) {
   try {
-    const { email, name } = await req.json()
+    const { email, name, password } = await req.json()
 
-    const user = await createUser(email, name)
+    const user = await createUser(email, name, password)
 
     return NextResponse.json({ success: true, user }, { status: 201 })
   } catch (error: any) {

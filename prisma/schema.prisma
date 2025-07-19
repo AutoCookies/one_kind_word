@@ -10,6 +10,7 @@ datasource db {
 model User {
   id        Int       @id @default(autoincrement())
   email     String?   @unique // có thể null nếu ẩn danh
+  password  String?
   name      String?   // nickname
   createdAt DateTime  @default(now())
   messages  Message[] // 1 user có thể gửi nhiều message
