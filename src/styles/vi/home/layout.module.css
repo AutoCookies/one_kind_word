@@ -1,0 +1,35 @@
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+.button {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #0070f3;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.button:hover {
+  background-color: #0059c1;
+}
+
+.popupContainer {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid #ccc;
+  padding: 2rem;
+  z-index: 1000;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 12px;
+}

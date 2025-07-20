@@ -1,6 +1,7 @@
 // src/controllers/userController.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser, loginUser } from '@/services/userService'
+import { createUser, loginUser, logoutUser } from '@/services/userService'
+import { generateAccessToken, generateRefreshToken } from '@/lib/jwt'
 
 export async function registerUser(req: NextRequest) {
   try {
@@ -24,12 +25,29 @@ export async function loginUserController(req: NextRequest) {
 
     const user = await loginUser(email)
 
-    const response = NextResponse.json({ success: true, user })
+    const accessToken = generateAccessToken({ userId: user.id })
+    const refreshToken = generateRefreshToken({ userId: user.id })
 
-    response.cookies.set('user_id', user.id.toString(), {
+    const response = NextResponse.json({
+      success: true,
+      user,
+      accessToken,
+    })
+
+    response.cookies.set('access_token', accessToken, {
       httpOnly: true,
       path: '/',
-      maxAge: 60 * 60 * 24 * 30, // 30 ngày
+      maxAge: 60 * 5,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+    })
+
+    response.cookies.set('refresh_token', refreshToken, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 60 * 60 * 24,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
     })
 
     return response
@@ -42,4 +60,27 @@ export async function loginUserController(req: NextRequest) {
   }
 }
 
+export async function logoutUserController(req: NextRequest) {
+  try {
+    const response = NextResponse.json({ success: true, message: 'Đã đăng xuất' })
+
+    // Xóa cookie bằng cách set lại với maxAge = 0
+    response.cookies.set('access_token', '', {
+      path: '/',
+      maxAge: 0,
+    })
+    response.cookies.set('refresh_token', '', {
+      path: '/',
+      maxAge: 0,
+    })
+
+    return response
+  } catch (error: any) {
+    console.error('[LOGOUT_ERROR]', error.message)
+    return NextResponse.json(
+      { success: false, error: error.message || 'Lỗi server' },
+      { status: 400 }
+    )
+  }
+}
 

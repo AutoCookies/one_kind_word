@@ -1,30 +1,25 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import jwt from 'jsonwebtoken'
 
-export const config = {
-  matcher: [
-    '/api/message/route.ts',
-  ],
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_KEY!
+
+export function middleware(req: NextRequest) {
+  const accessToken = req.headers.get('authorization')?.replace('Bearer ', '')
+
+  if (!accessToken) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const decoded = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
+    
+    return NextResponse.next()
+  } catch (error) {
+    return NextResponse.json({ success: false, error: 'Invalid or expired token' }, { status: 401 })
+  }
 }
 
-export function checkToken (req: NextRequest) {
-    const token = req.cookies.get("user_id");
-
-    if (!token) {
-        return NextResponse.json(
-            { success: false, error: "Unauthorized" },
-            { status: 401 }
-        );
-    }
-
-    const userId = token.value;
-
-    if (!userId) {
-        return NextResponse.json(
-            { success: false, error: "Invalid token" },
-            { status: 401 }
-        );
-    }
-
-    return token;
+export const config = {
+  matcher: ['/api/message/:path*'], 
 }

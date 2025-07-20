@@ -1,0 +1,53 @@
+.container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.date {
+  font-size: 1rem;
+  color: #777;
+  margin-bottom: 2rem;
+}
+
+.content {
+  animation: fadeIn 0.5s ease-in-out;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #f9f9f9;
+}
+
+.loading {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.error {
+  color: red;
+  font-weight: 500;
+}
+
+.noMessage {
+  color: #999;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

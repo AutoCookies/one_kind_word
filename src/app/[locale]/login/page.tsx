@@ -36,7 +36,7 @@ export default function LoginPage() {
             if (!res.ok) throw new Error(data.error || 'Đăng nhập thất bại')
 
             alert(isVietnamese ? 'Đăng nhập thành công!' : 'Login successful!')
-            window.location.href = `/${locale}/dashboard`
+            window.location.href = `/${locale}/home`
 
         } catch (err: any) {
             alert(err.message || (isVietnamese ? 'Có lỗi xảy ra' : 'Something went wrong'))

@@ -38,3 +38,7 @@ export async function loginUser(email?: string) {
 
   return user
 }
+
+export async function logoutUser() {
+  return { message: 'Đã đăng xuất thành công' }
+}
