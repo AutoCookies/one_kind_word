@@ -1,7 +1,7 @@
 // src/app/[locale]/loading.tsx
 'use client'
 
-import styles from '../../styles/vi/loading.module.css'
+import styles from '@/styles/loading.module.css'
 
 export default function LocaleLoading() {
   return (

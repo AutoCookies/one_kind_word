@@ -1,27 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
 import Image from 'next/image'
-import styles from '@/styles/vi/login/page.module.css'
+import styles from '@/styles/login/page.module.css'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-
-  const params = useParams()
-  const locale = params?.locale as string
-  const isVietnamese = locale === 'vi'
-
-  const content = {
-    title: isVietnamese ? 'Đăng nhập' : 'Login',
-    emailPlaceholder: isVietnamese ? 'Nhập email của bạn' : 'Enter your email',
-    passwordPlaceholder: isVietnamese ? 'Nhập mật khẩu của bạn' : 'Enter your password',
-    buttonText: isVietnamese ? 'Đăng nhập' : 'Login',
-    signup: isVietnamese ? 'Đăng ký' : 'Register',
-    askToSignup: isVietnamese ? 'Bạn chưa có tài khoản?' : 'Got no account?',
-  }
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -36,26 +22,21 @@ export default function LoginPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Đăng nhập thất bại')
 
-      alert(isVietnamese ? 'Đăng nhập thành công!' : 'Login successful!')
-      window.location.href = `/${locale}/home`
+      alert('Đăng nhập thành công!')
+      window.location.href = '/home'
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : isVietnamese
-          ? 'Có lỗi xảy ra'
-          : 'Something went wrong'
+      const message = err instanceof Error ? err.message : 'Có lỗi xảy ra'
       alert(message)
     }
   }
 
   return (
     <div className="login-page">
-      <h1 className={styles.title}>{content.title}</h1>
+      <h1 className={styles.title}>Đăng nhập</h1>
       <form className={styles.form} onSubmit={handleLogin}>
         <input
           type="email"
-          placeholder={content.emailPlaceholder}
+          placeholder="Nhập email của bạn"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={styles.input}
@@ -65,7 +46,7 @@ export default function LoginPage() {
         <div className={styles.passwordWrapper}>
           <input
             type={showPassword ? 'text' : 'password'}
-            placeholder={content.passwordPlaceholder}
+            placeholder="Nhập mật khẩu của bạn"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={styles.input}
@@ -80,7 +61,7 @@ export default function LoginPage() {
             <Image
               className={styles.eye}
               src={showPassword ? '/vi/eye-svgrepo-com.svg' : '/vi/eye-closed-svgrepo-com.svg'}
-              alt={showPassword ? 'Hide password' : 'Show password'}
+              alt={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               width={20}
               height={20}
             />
@@ -88,17 +69,17 @@ export default function LoginPage() {
         </div>
 
         <button type="submit" className={styles.button}>
-          {content.buttonText}
+          Đăng nhập
         </button>
 
         <p className={styles.signup}>
-          {content.askToSignup}{' '}
+          Bạn chưa có tài khoản?{' '}
           <button
             type="button"
             className={styles.askToSignup}
-            onClick={() => (window.location.href = `/${locale}/register`)}
+            onClick={() => (window.location.href = '/register')}
           >
-            {content.signup}
+            Đăng ký
           </button>
         </p>
       </form>

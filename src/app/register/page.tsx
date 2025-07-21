@@ -1,8 +1,7 @@
 'use client'
 
-import styles from '@/styles/vi/register/page.module.css'
+import styles from '@/styles/register/page.module.css'
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
 import Image from 'next/image'
 
 export default function RegisterPage() {
@@ -13,25 +12,11 @@ export default function RegisterPage() {
   const [seenConfirmPassword, setSeenConfirmPassword] = useState(false)
   const [name, setName] = useState('')
 
-  const params = useParams()
-  const locale = params?.locale as string
-  const isVietnamese = locale === 'vi'
-
-  const content = {
-    title: isVietnamese ? 'Đăng ký' : 'Register',
-    emailPlaceholder: isVietnamese ? 'Nhập email của bạn' : 'Enter your email',
-    passwordPlaceholder: isVietnamese ? 'Nhập mật khẩu của bạn' : 'Enter your password',
-    confirmPasswordPlaceholder: isVietnamese ? 'Xác nhận mật khẩu' : 'Confirm password',
-    buttonText: isVietnamese ? 'Đăng ký' : 'Register',
-    signin: isVietnamese ? 'Đăng nhập' : 'Sign in',
-    askToSignin: isVietnamese ? 'Bạn đã có tài khoản?' : 'Already have an account?',
-  }
-
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
-      alert(isVietnamese ? 'Mật khẩu xác nhận không khớp' : 'Passwords do not match')
+      alert('Mật khẩu xác nhận không khớp')
       return
     }
 
@@ -46,22 +31,22 @@ export default function RegisterPage() {
 
       if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại')
 
-      alert(isVietnamese ? 'Đăng ký thành công!' : 'Registration successful!')
-      window.location.href = `/${locale}/login`
+      alert('Đăng ký thành công!')
+      window.location.href = '/login'
     } catch (err) {
-      const error = err instanceof Error ? err.message : 'Something went wrong'
+      const error = err instanceof Error ? err.message : 'Đã xảy ra lỗi'
       alert(error)
     }
   }
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>{content.title}</h1>
+      <h1 className={styles.title}>Đăng ký</h1>
       <form className={styles.form} onSubmit={handleRegister}>
         <input
           className={styles.input}
           type="text"
-          placeholder={isVietnamese ? 'Nhập tên của bạn' : 'Enter your name'}
+          placeholder="Nhập tên của bạn"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -69,7 +54,7 @@ export default function RegisterPage() {
         <input
           className={styles.input}
           type="email"
-          placeholder={content.emailPlaceholder}
+          placeholder="Nhập email của bạn"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -78,7 +63,7 @@ export default function RegisterPage() {
           <input
             className={styles.input}
             type={seenPassword ? 'text' : 'password'}
-            placeholder={content.passwordPlaceholder}
+            placeholder="Nhập mật khẩu của bạn"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -103,7 +88,7 @@ export default function RegisterPage() {
           <input
             className={styles.input}
             type={seenConfirmPassword ? 'text' : 'password'}
-            placeholder={content.confirmPasswordPlaceholder}
+            placeholder="Xác nhận mật khẩu"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -125,18 +110,18 @@ export default function RegisterPage() {
         </div>
 
         <span className={styles.signin}>
-          {content.askToSignin}{' '}
+          Bạn đã có tài khoản?{' '}
           <a
             className={styles.signinLink}
-            onClick={() => (window.location.href = `/${locale}/login`)}
+            onClick={() => (window.location.href = '/login')}
             role="link"
           >
-            {content.signin}
+            Đăng nhập
           </a>
         </span>
 
         <button className={styles.button} type="submit">
-          {content.buttonText}
+          Đăng ký
         </button>
       </form>
     </div>

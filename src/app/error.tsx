@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import styles from '../../styles/vi/error.module.css'
+import styles from '@/styles/error.module.css'
 
 export default function LocaleError({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter()

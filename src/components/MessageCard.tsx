@@ -1,5 +1,5 @@
 // src/components/MessageCard.tsx
-import styles from '@/styles/vi/components/MessageCard.module.css'
+import styles from '@/styles/components/MessageCard.module.css'
 
 interface Message {
   id: number

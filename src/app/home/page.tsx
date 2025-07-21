@@ -1,8 +1,7 @@
 'use client'
 
-import styles from '@/styles/vi/home/page.module.css'
+import styles from '@/styles/home/page.module.css'
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
 import MessageCard from '@/components/MessageCard'
 
 interface Message {
@@ -13,20 +12,14 @@ interface Message {
 }
 
 export default function HomePage() {
-  const params = useParams()
-  const locale = params?.locale as string
-  const isVietnamese = locale === 'vi'
-
   const emojis = ['🌟', '💌', '📜', '🧡', '🌈', '✉️']
   const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
 
   const content = {
-    title: isVietnamese ? 'Lời nhắn hôm nay' : 'Message of the Day',
-    loading: isVietnamese ? 'Đang tải lời nhắn...' : 'Loading message...',
-    noMessage: isVietnamese
-      ? 'Bạn chưa có lời nhắn nào hôm nay!'
-      : 'No message for today!',
-    today: new Date().toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', {
+    title: 'Lời nhắn hôm nay',
+    loading: 'Đang tải lời nhắn...',
+    noMessage: 'Bạn chưa có lời nhắn nào hôm nay!',
+    today: new Date().toLocaleDateString('vi-VN', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

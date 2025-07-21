@@ -3,6 +3,7 @@ import { createUser, loginUser } from '@/services/userService'
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt'
 import { RegisterInput, LoginInput } from '@/types/user'
 
+// Đăng ký người dùng
 export async function registerUser(req: NextRequest) {
   try {
     const body = (await req.json()) as unknown
@@ -21,24 +22,27 @@ export async function registerUser(req: NextRequest) {
     }
 
     return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
-  } catch (error) {
+  } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error('Unknown error')
     console.error('[REGISTER_ERROR]', err.message)
-    return NextResponse.json(
-      { success: false, error: err.message || 'Lỗi server' },
-      { status: 400 }
-    )
+
+    return NextResponse.json({ success: false, error: err.message }, { status: 400 })
   }
 }
 
+// Đăng nhập người dùng
 export async function loginUserController(req: NextRequest) {
   try {
     const body = (await req.json()) as unknown
 
-    if (typeof body === 'object' && body !== null && 'email' in body) {
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'email' in body
+    ) {
       const { email } = body as LoginInput
-
       const user = await loginUser(email)
+
       const accessToken = generateAccessToken({ userId: user.id })
       const refreshToken = generateRefreshToken({ userId: user.id })
 
@@ -51,7 +55,7 @@ export async function loginUserController(req: NextRequest) {
       response.cookies.set('access_token', accessToken, {
         httpOnly: true,
         path: '/',
-        maxAge: 60 * 5,
+        maxAge: 60 * 5, // 5 phút
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       })
@@ -59,7 +63,7 @@ export async function loginUserController(req: NextRequest) {
       response.cookies.set('refresh_token', refreshToken, {
         httpOnly: true,
         path: '/',
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60 * 24, // 1 ngày
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       })
@@ -68,17 +72,16 @@ export async function loginUserController(req: NextRequest) {
     }
 
     return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
-  } catch (error) {
+  } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error('Unknown error')
     console.error('[LOGIN_ERROR]', err.message)
-    return NextResponse.json(
-      { success: false, error: err.message || 'Lỗi server' },
-      { status: 400 }
-    )
+
+    return NextResponse.json({ success: false, error: err.message }, { status: 400 })
   }
 }
 
-export async function logoutUserController(_req: NextRequest) {
+// Đăng xuất
+export async function logoutUserController() {
   try {
     const response = NextResponse.json({ success: true, message: 'Đã đăng xuất' })
 
@@ -93,12 +96,12 @@ export async function logoutUserController(_req: NextRequest) {
     })
 
     return response
-  } catch (error) {
+  } catch (error: unknown) {
     const err = error instanceof Error ? error : new Error('Unknown error')
     console.error('[LOGOUT_ERROR]', err.message)
-    return NextResponse.json(
-      { success: false, error: err.message || 'Lỗi server' },
-      { status: 400 }
-    )
+
+    return NextResponse.json({ success: false, error: err.message }, { status: 400 })
   }
 }
+
+

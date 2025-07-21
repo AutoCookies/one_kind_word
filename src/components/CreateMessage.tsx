@@ -1,6 +1,6 @@
 'use client'
 
-import styles from '@/styles/vi/components/CreateMessage.module.css'
+import styles from '@/styles/components/CreateMessage.module.css'
 import { useState } from 'react'
 
 type TextProps = {
