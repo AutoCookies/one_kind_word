@@ -9,12 +9,13 @@ if (!ACCESS_TOKEN_KEY || !REFRESH_TOKEN_KEY) {
 }
 
 const accessTokenOptions: SignOptions = {
-  expiresIn: (process.env.ACCESS_TOKEN_EXPIRES_IN) as string,
+  expiresIn: '5m',
 }
 
 const refreshTokenOptions: SignOptions = {
-  expiresIn: (process.env.REFRESH_TOKEN_EXPIRES_IN) as string,
+  expiresIn: '1d'
 }
+
 
 export function generateAccessToken(payload: object) {
   return jwt.sign(payload, ACCESS_TOKEN_KEY, accessTokenOptions)

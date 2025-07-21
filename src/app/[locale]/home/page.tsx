@@ -47,8 +47,12 @@ export default function HomePage() {
         if (!res.ok) throw new Error(data.error || 'Lỗi không xác định')
 
         setMessage(data.message)
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message)
+        } else {
+          setError('Đã xảy ra lỗi không xác định')
+        }
       } finally {
         setLoading(false)
       }
@@ -67,7 +71,9 @@ export default function HomePage() {
       <div className={styles.content}>
         {loading && <p className={styles.loading}>{content.loading}</p>}
         {error && <p className={styles.error}>{error}</p>}
-        {!loading && !message && <p className={styles.noMessage}>{content.noMessage}</p>}
+        {!loading && !message && (
+          <p className={styles.noMessage}>{content.noMessage}</p>
+        )}
         {message && <MessageCard message={message} />}
       </div>
     </div>
