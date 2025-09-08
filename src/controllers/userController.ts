@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createUser, loginUser } from '@/services/userService'
+import { sendOTP, verifyOtpAndCreateUser, loginUser } from '@/services/userService'
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt'
-import { RegisterInput, LoginInput } from '@/types/user'
+import { RegisterInput, VerifyOtpInput, LoginInput } from '@/types/user'
 
-// Đăng ký người dùng
+// Bước 1: Gửi OTP khi đăng ký
 export async function registerUser(req: NextRequest) {
   try {
     const body = (await req.json()) as unknown
@@ -16,9 +16,14 @@ export async function registerUser(req: NextRequest) {
       'password' in body
     ) {
       const { email, name, password } = body as RegisterInput
-      const user = await createUser(email, name, password)
 
-      return NextResponse.json({ success: true, user }, { status: 201 })
+      // Gọi service gửi OTP
+      await sendOTP(email, name, password)
+
+      return NextResponse.json({
+        success: true,
+        message: 'OTP đã gửi đến email của bạn. Vui lòng xác nhận OTP để hoàn tất đăng ký.',
+      })
     }
 
     return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
@@ -30,7 +35,34 @@ export async function registerUser(req: NextRequest) {
   }
 }
 
-// Đăng nhập người dùng
+// Bước 2: Xác thực OTP & tạo user
+export async function verifyOtpAndRegisterUser(req: NextRequest) {
+  try {
+    const body = (await req.json()) as unknown
+
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'email' in body &&
+      'otp' in body
+    ) {
+      const { email, otp } = body as VerifyOtpInput
+
+      const user = await verifyOtpAndCreateUser(email, otp)
+
+      return NextResponse.json({ success: true, user }, { status: 201 })
+    }
+
+    return NextResponse.json({ success: false, error: 'Invalid input' }, { status: 400 })
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error('Unknown error')
+    console.error('[VERIFY_OTP_ERROR]', err.message)
+
+    return NextResponse.json({ success: false, error: err.message }, { status: 400 })
+  }
+}
+
+// Login & Logout giữ nguyên
 export async function loginUserController(req: NextRequest) {
   try {
     const body = (await req.json()) as unknown
@@ -55,7 +87,7 @@ export async function loginUserController(req: NextRequest) {
       response.cookies.set('access_token', accessToken, {
         httpOnly: true,
         path: '/',
-        maxAge: 60 * 5, // 5 phút
+        maxAge: 60 * 5,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       })
@@ -63,7 +95,7 @@ export async function loginUserController(req: NextRequest) {
       response.cookies.set('refresh_token', refreshToken, {
         httpOnly: true,
         path: '/',
-        maxAge: 60 * 60 * 24, // 1 ngày
+        maxAge: 60 * 60 * 24,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
       })
@@ -80,20 +112,12 @@ export async function loginUserController(req: NextRequest) {
   }
 }
 
-// Đăng xuất
 export async function logoutUserController() {
   try {
     const response = NextResponse.json({ success: true, message: 'Đã đăng xuất' })
 
-    response.cookies.set('access_token', '', {
-      path: '/',
-      maxAge: 0,
-    })
-
-    response.cookies.set('refresh_token', '', {
-      path: '/',
-      maxAge: 0,
-    })
+    response.cookies.set('access_token', '', { path: '/', maxAge: 0 })
+    response.cookies.set('refresh_token', '', { path: '/', maxAge: 0 })
 
     return response
   } catch (error: unknown) {
@@ -103,5 +127,3 @@ export async function logoutUserController() {
     return NextResponse.json({ success: false, error: err.message }, { status: 400 })
   }
 }
-
-

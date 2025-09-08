@@ -7,3 +7,8 @@ export interface RegisterInput {
 export interface LoginInput {
   email: string
 }
+
+export interface VerifyOtpInput {
+  email: string
+  otp: string
+}

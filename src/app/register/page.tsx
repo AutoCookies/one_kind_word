@@ -8,17 +8,16 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [name, setName] = useState('')
+  const [otp, setOtp] = useState('')
+  const [step, setStep] = useState<'form' | 'otp'>('form')
   const [seenPassword, setSeenPassword] = useState(false)
   const [seenConfirmPassword, setSeenConfirmPassword] = useState(false)
-  const [name, setName] = useState('')
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    if (password !== confirmPassword) {
-      alert('Mật khẩu xác nhận không khớp')
-      return
-    }
+  // Bước 1: Gửi OTP
+  const handleSendOtp = async () => {
+    if (!email || !name || !password) return alert('Điền đầy đủ thông tin')
+    if (password !== confirmPassword) return alert('Mật khẩu xác nhận không khớp')
 
     try {
       const res = await fetch('/api/user/register', {
@@ -27,9 +26,30 @@ export default function RegisterPage() {
         body: JSON.stringify({ email, name, password }),
       })
 
-      const data: { error?: string } = await res.json()
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Gửi OTP thất bại')
 
-      if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại')
+      alert('OTP đã gửi đến email của bạn')
+      setStep('otp')
+    } catch (err) {
+      const error = err instanceof Error ? err.message : 'Đã xảy ra lỗi'
+      alert(error)
+    }
+  }
+
+  // Bước 2: Xác thực OTP & tạo user
+  const handleVerifyOtp = async () => {
+    if (!otp) return alert('Nhập OTP')
+
+    try {
+      const res = await fetch('/api/user/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Xác thực OTP thất bại')
 
       alert('Đăng ký thành công!')
       window.location.href = '/login'
@@ -42,88 +62,101 @@ export default function RegisterPage() {
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Đăng ký</h1>
-      <form className={styles.form} onSubmit={handleRegister}>
-        <input
-          className={styles.input}
-          type="text"
-          placeholder="Nhập tên của bạn"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
 
-        <input
-          className={styles.input}
-          type="email"
-          placeholder="Nhập email của bạn"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <div className={styles.passwordWrapper}>
+      {step === 'form' ? (
+        <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
           <input
             className={styles.input}
-            type={seenPassword ? 'text' : 'password'}
-            placeholder="Nhập mật khẩu của bạn"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="text"
+            placeholder="Nhập tên của bạn"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-          <span
-            className={styles.toggle}
-            onClick={() => setSeenPassword(!seenPassword)}
-            role="button"
-            aria-label="toggle password"
-            tabIndex={0}
-          >
-            <Image
-              className={styles.eye}
-              src={seenPassword ? '/vi/eye-svgrepo-com.svg' : '/vi/eye-closed-svgrepo-com.svg'}
-              alt={seenPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-              width={24}
-              height={24}
-            />
-          </span>
-        </div>
-
-        <div className={styles.passwordWrapper}>
           <input
             className={styles.input}
-            type={seenConfirmPassword ? 'text' : 'password'}
-            placeholder="Xác nhận mật khẩu"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            type="email"
+            placeholder="Nhập email của bạn"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <span
-            className={styles.toggle}
-            onClick={() => setSeenConfirmPassword(!seenConfirmPassword)}
-            role="button"
-            aria-label="toggle confirm password"
-            tabIndex={0}
-          >
-            <Image
-              className={styles.eye}
-              src={seenConfirmPassword ? '/vi/eye-svgrepo-com.svg' : '/vi/eye-closed-svgrepo-com.svg'}
-              alt={seenConfirmPassword ? 'Ẩn xác nhận mật khẩu' : 'Hiện xác nhận mật khẩu'}
-              width={24}
-              height={24}
+
+          <div className={styles.passwordWrapper}>
+            <input
+              className={styles.input}
+              type={seenPassword ? 'text' : 'password'}
+              placeholder="Nhập mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
-          </span>
+            <span
+              className={styles.toggle}
+              onClick={() => setSeenPassword(!seenPassword)}
+              role="button"
+              tabIndex={0}
+            >
+              <Image
+                className={styles.eye}
+                src={seenPassword ? '/vi/eye-svgrepo-com.svg' : '/vi/eye-closed-svgrepo-com.svg'}
+                alt={seenPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                width={24}
+                height={24}
+              />
+            </span>
+          </div>
+
+          <div className={styles.passwordWrapper}>
+            <input
+              className={styles.input}
+              type={seenConfirmPassword ? 'text' : 'password'}
+              placeholder="Xác nhận mật khẩu"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <span
+              className={styles.toggle}
+              onClick={() => setSeenConfirmPassword(!seenConfirmPassword)}
+              role="button"
+              tabIndex={0}
+            >
+              <Image
+                className={styles.eye}
+                src={seenConfirmPassword ? '/vi/eye-svgrepo-com.svg' : '/vi/eye-closed-svgrepo-com.svg'}
+                alt={seenConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                width={24}
+                height={24}
+              />
+            </span>
+          </div>
+
+          <button type="button" className={styles.button} onClick={handleSendOtp}>
+            Gửi OTP
+          </button>
+        </form>
+      ) : (
+        <div className={styles.form}>
+          <input
+            className={styles.input}
+            type="text"
+            placeholder="Nhập OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+          <button type="button" className={styles.button} onClick={handleVerifyOtp}>
+            Xác nhận đăng ký
+          </button>
         </div>
+      )}
 
-        <span className={styles.signin}>
-          Bạn đã có tài khoản?{' '}
-          <a
-            className={styles.signinLink}
-            onClick={() => (window.location.href = '/login')}
-            role="link"
-          >
-            Đăng nhập
-          </a>
-        </span>
-
-        <button className={styles.button} type="submit">
-          Đăng ký
-        </button>
-      </form>
+      <span className={styles.signin}>
+        Bạn đã có tài khoản?{' '}
+        <a
+          className={styles.signinLink}
+          onClick={() => (window.location.href = '/login')}
+          role="link"
+        >
+          Đăng nhập
+        </a>
+      </span>
     </div>
   )
 }
