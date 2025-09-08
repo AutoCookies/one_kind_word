@@ -1,13 +1,12 @@
-// src/services/userService.ts
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcrypt'
 import { Resend } from 'resend'
-import redis from '@/lib/redis' // Redis client đã connect sẵn
+import { randomInt } from 'crypto'
 
 const resend = new Resend(process.env.RESEND_ACCESS_KEY)
 
 /**
- * Gửi OTP đến email và lưu tạm trong Redis
+ * Gửi OTP đến email và lưu tạm trong DB (5 phút)
  */
 export async function sendOTP(email: string, name: string, password: string) {
   if (!email) throw new Error('Email là bắt buộc')
@@ -17,15 +16,19 @@ export async function sendOTP(email: string, name: string, password: string) {
   const existingUser = await prisma.user.findUnique({ where: { email } })
   if (existingUser) throw new Error('Email đã tồn tại')
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString() // 6 chữ số
+  const otp = randomInt(100000, 999999).toString()
   const passwordHash = await bcrypt.hash(password, 10)
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 phút
 
-  // Lưu OTP + thông tin user trong Redis, hết hạn 5 phút
-  const record = { otp, name, passwordHash }
-  await redis.set(`otp:${email}`, JSON.stringify(record), { EX: 300 }) // 300 giây = 5 phút
+  // Upsert để mỗi email chỉ giữ 1 OTP (gửi lại sẽ ghi đè)
+  await prisma.otpVerification.upsert({
+    where: { email },
+    update: { otp, name, passwordHash, expiresAt },
+    create: { email, otp, name, passwordHash, expiresAt },
+  })
 
   // Gửi OTP email
-  const { data, error } = await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: 'Cookiescooker <no-reply@cookiescooker.click>',
     to: email,
     subject: 'Your Verify OTP Code',
@@ -40,13 +43,11 @@ export async function sendOTP(email: string, name: string, password: string) {
  * Kiểm tra OTP và tạo user nếu đúng
  */
 export async function verifyOtpAndCreateUser(email: string, otp: string) {
-  const recordRaw = await redis.get(`otp:${email}`)
-  if (!recordRaw) throw new Error('Không tìm thấy OTP cho email này')
-
-  const record = JSON.parse(recordRaw)
+  const record = await prisma.otpVerification.findUnique({ where: { email } })
+  if (!record) throw new Error('Không tìm thấy OTP cho email này')
+  if (record.expiresAt < new Date()) throw new Error('OTP đã hết hạn')
   if (record.otp !== otp) throw new Error('OTP không hợp lệ')
 
-  // Tạo user trong DB
   const user = await prisma.user.create({
     data: {
       email,
@@ -55,8 +56,8 @@ export async function verifyOtpAndCreateUser(email: string, otp: string) {
     },
   })
 
-  // Xóa OTP đã dùng
-  await redis.del(`otp:${email}`)
+  // Xoá OTP đã dùng
+  await prisma.otpVerification.delete({ where: { email } })
 
   return user
 }

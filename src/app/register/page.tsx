@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState<'form' | 'otp'>('form')
   const [seenPassword, setSeenPassword] = useState(false)
   const [seenConfirmPassword, setSeenConfirmPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // Bước 1: Gửi OTP
   const handleSendOtp = async () => {
@@ -20,6 +21,7 @@ export default function RegisterPage() {
     if (password !== confirmPassword) return alert('Mật khẩu xác nhận không khớp')
 
     try {
+      setLoading(true)
       const res = await fetch('/api/user/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -34,6 +36,8 @@ export default function RegisterPage() {
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Đã xảy ra lỗi'
       alert(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -42,6 +46,7 @@ export default function RegisterPage() {
     if (!otp) return alert('Nhập OTP')
 
     try {
+      setLoading(true)
       const res = await fetch('/api/user/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,7 +61,15 @@ export default function RegisterPage() {
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Đã xảy ra lỗi'
       alert(error)
+    } finally {
+      setLoading(false)
     }
+  }
+
+  // Gửi lại OTP (reuse handleSendOtp)
+  const handleResendOtp = async () => {
+    if (!email || !name || !password) return alert('Thiếu thông tin để gửi lại OTP')
+    await handleSendOtp()
   }
 
   return (
@@ -128,8 +141,13 @@ export default function RegisterPage() {
             </span>
           </div>
 
-          <button type="button" className={styles.button} onClick={handleSendOtp}>
-            Gửi OTP
+          <button
+            type="button"
+            className={styles.button}
+            onClick={handleSendOtp}
+            disabled={loading}
+          >
+            {loading ? 'Đang gửi...' : 'Gửi OTP'}
           </button>
         </form>
       ) : (
@@ -141,8 +159,22 @@ export default function RegisterPage() {
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
           />
-          <button type="button" className={styles.button} onClick={handleVerifyOtp}>
-            Xác nhận đăng ký
+          <button
+            type="button"
+            className={styles.button}
+            onClick={handleVerifyOtp}
+            disabled={loading}
+          >
+            {loading ? 'Đang xác thực...' : 'Xác nhận đăng ký'}
+          </button>
+
+          <button
+            type="button"
+            className={styles.buttonSecondary}
+            onClick={handleResendOtp}
+            disabled={loading}
+          >
+            Gửi lại OTP
           </button>
         </div>
       )}

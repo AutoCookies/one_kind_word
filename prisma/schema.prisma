@@ -29,3 +29,14 @@ model Message {
   userId    Int?      
   user      User?     @relation(fields: [userId], references: [id])
 }
+
+// schema.prisma
+model OtpVerification {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  otp          String
+  name         String
+  passwordHash String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}
